@@ -38,11 +38,27 @@ db.connect((err) => {
 //Ruta - Get
 app.get('/contacto', (req, res) => {
     res.sendFile(__dirname + '/Public/contacto.html');
-});
+})
 
 //Ruta - Post Envio del formulario - db
+app.post('/contacto', (req, res) => {
+    //Cuerpo de la solicitud
+    const {name, email, phone, subject, message} = req.body;
+    console.log(req.body);
+
+    //Consulta a db para poder guardarlos
+    const query = `INSERT INTO contactos (nombre, correo, telefono, asunto, mensaje) VALUES (?, ?, ?, ?, ?)`;
+    db.query(query, [name, email, phone, subject, message], (err, results) => {
+        if (err) {
+            console.error('Error al guardar en la base de datos', err);
+            return res.status(500).json({ error: 'Error al guardar la información'});
+        }
+        res.status(201).json({ message: 'Información guardada correctamente'});
+    });
+        console.log('Contacto guardado en la base de datos');
+})
 
 //Iniciar el servidor
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en http://localhost:${PORT}`);
-});
+})
